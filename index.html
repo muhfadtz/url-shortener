@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: 'nexa', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40vh;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: #4c6daf;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgb(127, 219, 255);
+        }
+
+        h6 {
+            display: none;
+            margin-top: 40px;
+        }
+
+        p {
+            margin-top: -20px;
+            padding: 10px;
+            word-break: break-all;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+            font-size: small;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .copyright {
+            margin-top: 10px;
+            font-size: small;
+        }
+
+        .copy-button {
+            display: none;
+            background-color: #4c6daf;
+            color: #ffffff;
+            padding: 8px 8px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100px;
+            height: 30px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-button:hover {
+            background-color: rgb(127, 219, 255);
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="../img/logo.png" alt="profile" style="max-width: 40px;">
+        <h2>URL Shortener</h2>
+        <input type="text" id="originalUrl" placeholder="Enter your URL here" autocomplete="off">
+        <button onclick="shortenUrl()">Shorten</button>
+        <h6>URL Shortened:</h6>
+        <p id="shortenedUrl"></p>
+        <button class="copy-button" onclick="copyToClipboard()"><i class="far fa-copy"></i>&nbsp;Copy Link</button>
+        <span class="copyright">©2023 Narwhal</span>
+    </div>
+
+    <script>
+        async function shortenUrl() {
+            var longUrl = document.getElementById('originalUrl').value;
+            var accessToken = "040792ae38f9c7a8b5d23f80906b987afdc6a4db"; // Ganti dengan access token Bitly Anda
+            var apiUrl = "https://api-ssl.bitly.com/v4/shorten";
+
+            var response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ long_url: longUrl })
+            });
+
+            var data = await response.json();
+            if (data.link) {
+                displayShortenedUrl(data.link);
+                document.querySelector('.copy-button').style.display = 'block';
+            } else {
+                displayShortenedUrl("Error: Unable to shorten URL");
+            }
+        }
+
+        function displayShortenedUrl(url) {
+            var displayContainer = document.getElementById('shortenedUrl');
+            displayContainer.innerHTML = "<b style='color: #4c6daf'>" + url + "</b>";
+            displayContainer.style.border = "2px dotted #4c6daf";
+            document.querySelector('h6').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            var copyText = document.getElementById("shortenedUrl");
+            var textArea = document.createElement("textarea");
+            textArea.value = copyText.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+            alert("URL copied to clipboard: " + textArea.value);
+        }
+    </script>
+</body>
+</html>
